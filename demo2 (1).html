@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Slip Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 1em;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .login-container, .salary-slip-container, .add-employee-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            padding: 12px;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .salary-slip-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .salary-slip-table th, .salary-slip-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .salary-slip-header, .net-payable-row {
+            text-align: center;
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .net-payable-row td {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+    <script>
+        const defaultUsers = {
+            "employee1": { name: "John Doe", id: "TI-2024-09", basic: 3000, hra: 800, allowances: 200, tax: 500, pf: 300, insurance: 100 },
+            "employee2": { name: "Jane Smith", id: "TI-2024-10", basic: 3200, hra: 850, allowances: 220, tax: 550, pf: 320, insurance: 120 },
+            "employee3": { name: "Michael Johnson", id: "TI-2024-11", basic: 3100, hra: 820, allowances: 210, tax: 530, pf: 310, insurance: 110 }
+        };
+
+        function loadUsers() {
+            const users = localStorage.getItem("users");
+            return users ? JSON.parse(users) : { ...defaultUsers };
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        function initializeUsers() {
+            if (!localStorage.getItem("users")) {
+                saveUsers(defaultUsers);
+            }
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const users = loadUsers();
+
+            if (users[username] && password === "12345") {
+                const user = users[username];
+                document.querySelector('.login-container').style.display = 'none';
+                document.querySelector('.salary-slip-container').style.display = 'block';
+                document.getElementById("employeeName").innerText = user.name;
+                document.getElementById("employeeID").innerText = user.id;
+                document.getElementById("basicSalary").innerText = `$${user.basic}`;
+                document.getElementById("hra").innerText = `$${user.hra}`;
+                document.getElementById("allowances").innerText = `$${user.allowances}`;
+                document.getElementById("tax").innerText = `$${user.tax}`;
+                document.getElementById("pf").innerText = `$${user.pf}`;
+                document.getElementById("insurance").innerText = `$${user.insurance}`;
+                document.getElementById("netPayable").innerText = `$${user.basic + user.hra + user.allowances - user.tax - user.pf - user.insurance}`;
+            } else {
+                alert("Invalid credentials. Please try again.");
+            }
+        }
+
+        function addEmployee(event) {
+            event.preventDefault();
+            const username = document.getElementById("newUsername").value;
+            const name = document.getElementById("newName").value;
+            const id = document.getElementById("newID").value;
+            const basic = parseFloat(document.getElementById("newBasic").value);
+            const hra = parseFloat(document.getElementById("newHRA").value);
+            const allowances = parseFloat(document.getElementById("newAllowances").value);
+            const tax = parseFloat(document.getElementById("newTax").value);
+            const pf = parseFloat(document.getElementById("newPF").value);
+            const insurance = parseFloat(document.getElementById("newInsurance").value);
+
+            if (!username || !name || !id || isNaN(basic) || isNaN(hra) || isNaN(allowances) || isNaN(tax) || isNaN(pf) || isNaN(insurance)) {
+                alert("Please fill out all fields correctly.");
+                return;
+            }
+
+            const users = loadUsers();
+            users[username] = { name, id, basic, hra, allowances, tax, pf, insurance };
+            saveUsers(users);
+
+            alert("Employee added successfully!");
+            document.getElementById("addEmployeeForm").reset();
+        }
+
+        window.onload = initializeUsers;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Login to View Salary Slip</h2>
+                <form onsubmit="login(event)">
+                    <input type="text" id="username" placeholder="Username" required><br>
+                    <input type="password" id="password" placeholder="Password" required><br>
+                    <input type="submit" value="Login">
+                </form>
+            </div>
+        </div>
+
+        <!-- Salary Slip Page -->
+        <div class="salary-slip-container">
+            <h2>Salary Slip</h2>
+            <div class="salary-slip-header">Employee Details</div>
+            <table class="salary-slip-table">
+                <tr><th>Name</th><td id="employeeName"></td></tr>
+                <tr><th>ID</th><td id="employeeID"></td></tr>
+            </table>
+
+            <div class="salary-slip-header">Earnings & Deductions</div>
+            <table class="salary-slip-table">
+                <tr><th>Basic Salary</th><td id="basicSalary"></td></tr>
+                <tr><th>HRA</th><td id="hra"></td></tr>
+                <tr><th>Allowances</th><td id="allowances"></td></tr>
+                <tr><th>Tax</th><td id="tax"></td></tr>
+                <tr><th>Provident Fund</th><td id="pf"></td></tr>
+                <tr><th>Insurance</th><td id="insurance"></td></tr>
+            </table>
+
+            <table class="salary-slip-table net-payable-row">
+                <tr><td>Net Payable</td><td id="netPayable"></td></tr>
+            </table>
+        </div>
+
+        <!-- Add Employee Form -->
+        <div class="add-employee-container">
+            <h2>Add New Employee</h2>
+            <form id="addEmployeeForm" onsubmit="addEmployee(event)">
+                <input type="text" id="newUsername" placeholder="Username" required><br>
+                <input type="text" id="newName" placeholder="Employee Name" required><br>
+                <input type="text" id="newID" placeholder="Employee ID" required><br>
+                <input type="number" id="newBasic" placeholder="Basic Salary" required><br>
+                <input type="number" id="newHRA" placeholder="HRA" required><br>
+                <input type="number" id="newAllowances" placeholder="Allowances" required><br>
+                <input type="number" id="newTax" placeholder="Tax" required><br>
+                
+                <input type="number" id="newPF" placeholder="Provident Fund" required><br>
+                <input type="number" id="newInsurance" placeholder="Insurance" required><br>
+                <input type="submit" value="Add Employee">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
